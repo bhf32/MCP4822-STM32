@@ -64,8 +64,6 @@ typedef enum
 typedef struct
 {
 
-	MCP4822_DAC_SELECT dac_channel;
-
 	MCP4822_OUTPUT_GAIN gain;
 
 	MCP4822_OUTPUT_MODE shutdown;
@@ -74,6 +72,19 @@ typedef struct
 
 typedef struct
 {
+
+	MCP4822_Config_t chan_A_config;
+
+	MCP4822_Config_t chan_B_config;
+
+	MCP4822_DAC_SELECT chan_sel;
+
+}MCP4822_Chan_Configs_t;
+
+typedef struct
+{
+
+	MCP4822_Chan_Configs_t chan_configs;
 
 	GPIO_TypeDef *CS_Port;
 
@@ -85,6 +96,20 @@ typedef struct
 
 void MCP4822_handle_init(MCP4822_Handle_t *handle, GPIO_TypeDef *cs_port, uint16_t cs_pin, SPI_HandleTypeDef *hspi);
 
-MCP4822_STATUS MCP4822_write(MCP4822_Handle_t *handle, uint16_t value, MCP4822_Config_t *out_config);
+MCP4822_STATUS MCP4822_transmit_data(MCP4822_Handle_t *handle, uint16_t value);
+
+MCP4822_STATUS MCP4822_shutdown_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
+
+MCP4822_STATUS MCP4822_activate_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
+
+void MCP4822_set_chan_gain(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel, MCP4822_OUTPUT_GAIN gain_update);
+
+MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, MCP4822_DAC_SELECT dac_channel);
+
+MCP4822_STATUS MCP4822_write_to_both_chans(MCP4822_Handle_t *handle, uint16_t value);
+
+MCP4822_STATUS MCP4822_write_volts_to_chan(MCP4822_Handle_t *handle, float volts, MCP4822_DAC_SELECT dac_channel);
+
+MCP4822_STATUS MCP4822_write_volts_to_both_chans(MCP4822_Handle_t *handle, float volts);
 
 #endif /* __MCP4822_H_ */
