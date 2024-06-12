@@ -19,9 +19,6 @@
 #define FIRST_BIT_MASK  			   0x01
 #define LOW_HALF_BYTE_MASK			   0x000F
 #define FIRST_BYTE_MASK 			   0x00FF
-//#define SHIFT_12    			       12
-//#define SHIFT_13    			       13
-//#define SHIFT_15    			       15
 
 /** Limits and Commonly used conversion Macro*/
 #define MCP4822_RES      	   		   12
@@ -29,6 +26,9 @@
 #define MCP4822_VREF				   2.048f
 #define MCP4822_SPI_TIMEOUT			   1    //1 msec timeout
 
+/**
+ * @brief MCP4822 channel select mapping
+ */
 typedef enum
 {
 	MCP4822_CHANNEL_A			     = 0,
@@ -36,6 +36,9 @@ typedef enum
 
 }MCP4822_DAC_SELECT;
 
+/**
+ * @brief MCP4822 gain mapping
+ */
 typedef enum
 {
 	MCP4822_GAIN_2X			   	     = 0,
@@ -43,6 +46,9 @@ typedef enum
 
 }MCP4822_OUTPUT_GAIN;
 
+/**
+ * @brief MCP4822 output mode mapping
+ */
 typedef enum
 {
 	MCP4822_SHUTDOWN_MODE		   	 = 0,
@@ -61,6 +67,9 @@ typedef enum
 
 }MCP4822_STATUS;
 
+/**
+ * @brief configuration for MCP4822 channel gain and output mode
+ */
 typedef struct
 {
 
@@ -70,6 +79,9 @@ typedef struct
 
 }MCP4822_Config_t;
 
+/**
+ * @brief configuration for both MCP4822 channels
+ */
 typedef struct
 {
 
@@ -77,10 +89,11 @@ typedef struct
 
 	MCP4822_Config_t chan_B_config;
 
-	MCP4822_DAC_SELECT chan_sel;
-
 }MCP4822_Chan_Configs_t;
 
+/**
+ * @brief MCP4822 Driver Handle struct
+ */
 typedef struct
 {
 
@@ -96,15 +109,13 @@ typedef struct
 
 void MCP4822_handle_init(MCP4822_Handle_t *handle, GPIO_TypeDef *cs_port, uint16_t cs_pin, SPI_HandleTypeDef *hspi);
 
-MCP4822_STATUS MCP4822_transmit_data(MCP4822_Handle_t *handle, uint16_t value);
+MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, MCP4822_DAC_SELECT dac_channel);
 
 MCP4822_STATUS MCP4822_shutdown_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
 
 MCP4822_STATUS MCP4822_activate_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
 
 void MCP4822_set_chan_gain(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel, MCP4822_OUTPUT_GAIN gain_update);
-
-MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, MCP4822_DAC_SELECT dac_channel);
 
 MCP4822_STATUS MCP4822_write_to_both_chans(MCP4822_Handle_t *handle, uint16_t value);
 
