@@ -107,20 +107,89 @@ typedef struct
 
 }MCP4822_Handle_t;
 
+/**
+ * @brief Initializes the MCP4822 driver handle and enable the outputs
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param cs_port - CS pin GPIO port
+ * @param cs_pin - CS GPIO pin number
+ * @param hspi - STM32x SPI peripheral handle
+ *
+ * @return None
+ */
 void MCP4822_handle_init(MCP4822_Handle_t *handle, GPIO_TypeDef *cs_port, uint16_t cs_pin, SPI_HandleTypeDef *hspi);
 
+/**
+ * @brief Writes new DAC data to one of the MCP4822 device channels using SPI
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param value - digital value to be sent to DAC
+ * @param dac_channel - DAC channel to be written to
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, MCP4822_DAC_SELECT dac_channel);
 
+/**
+ * @brief Shutdowns one of the DAC channels
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param dac_channel - DAC channel to be shutdown
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_shutdown_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
 
+/**
+ * @brief Activates one of the DAC channels
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param dac_channel - DAC channel to be activated
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_activate_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
 
+/**
+ * @brief Set the gain for one of the DAC channels
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param dac_channel - DAC channel that's gain will be changed
+ * @param gain_update - updated gain value (1X or 2X)
+ *
+ * @return None
+ */
 void MCP4822_set_chan_gain(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel, MCP4822_OUTPUT_GAIN gain_update);
 
+/**
+ * @brief Writes new DAC data to both of the MCP4822 device channels using SPI
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param value - digital value to be sent to the DACs
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_write_to_both_chans(MCP4822_Handle_t *handle, uint16_t value);
 
+/**
+ * @brief Writes new DAC data, after converting from volts, to one of the MCP4822 device channels using SPI
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param volts - voltage value to be converted and sent to the DAC
+ * @param dac_channel - DAC channel to be written to
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_write_volts_to_chan(MCP4822_Handle_t *handle, float volts, MCP4822_DAC_SELECT dac_channel);
 
+/**
+ * @brief Writes new DAC data, after converting from volts, to both of the MCP4822 device channels using SPI
+ *
+ * @param handle - handle for MCP4822 driver
+ * @param volts - voltage value to be converted and sent to the DACs
+ *
+ * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
+ */
 MCP4822_STATUS MCP4822_write_volts_to_both_chans(MCP4822_Handle_t *handle, float volts);
 
 #endif /* __MCP4822_H_ */

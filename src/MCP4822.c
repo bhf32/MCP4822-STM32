@@ -4,23 +4,28 @@
  *  Created on: June 3, 2024
  *      Author: Ben Francis
  */
-
 #include "MCP4822.h"
 
-static inline MCP4822_Config_t *get_chan_config(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
-
-static inline uint16_t volts_to_DAC_units(float volts, MCP4822_OUTPUT_GAIN gain);
-
 /**
- * Initialize the MCP4822 driver handle and enable the outputs
+ * @brief Retrieves the pointer to the correct channel configuration
  *
  * @param handle - handle for MCP4822 driver
- * @param cs_port - CS pin GPIO port
- * @param cs_pin - CS GPIO pin number
- * @param hspi - STM32x SPI peripheral handle
+ * @param dac_channel - channel configuration to be returned
  *
- * @return None
+ * @return Pointer to DAC channel configuration struct
  */
+static inline MCP4822_Config_t *get_chan_config(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel);
+
+/**
+ * @brief Convert voltage units to DAC digital units
+ *
+ * @param volts - voltage value to be converted to DAC digital units
+ * @param gain - DAC channel gain
+ *
+ * @return Converted voltage value
+ */
+static inline uint16_t volts_to_DAC_units(float volts, MCP4822_OUTPUT_GAIN gain);
+
 void MCP4822_handle_init(MCP4822_Handle_t *handle, GPIO_TypeDef *cs_port, uint16_t cs_pin, SPI_HandleTypeDef *hspi){
 
 	//Assign the port and pins for the SPI CS pin
@@ -37,15 +42,6 @@ void MCP4822_handle_init(MCP4822_Handle_t *handle, GPIO_TypeDef *cs_port, uint16
 	handle->chan_configs.chan_B_config.shutdown = MCP4822_ACTIVE_MODE;
 }
 
-/**
- * Write new DAC data to one of the MCP4822 device channels using SPI
- *
- * @param handle - handle for MCP4822 driver
- * @param value - digital value to be sent to DAC
- * @param dac_channel - DAC channel to be written to
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, MCP4822_DAC_SELECT dac_channel){
 
 	//Limit value to the max input for MCP4822
@@ -78,14 +74,6 @@ MCP4822_STATUS MCP4822_write_to_chan(MCP4822_Handle_t *handle, uint16_t value, M
 	return MCP4822_OK;
 }
 
-/**
- * Shutdown one of the DAC channels
- *
- * @param handle - handle for MCP4822 driver
- * @param dac_channel - DAC channel to be shutdown
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_shutdown_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel){
 
 	//Receive the correct DAC channel configuration
@@ -101,14 +89,6 @@ MCP4822_STATUS MCP4822_shutdown_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELEC
 	return status;
 }
 
-/**
- * Activate one of the DAC channels
- *
- * @param handle - handle for MCP4822 driver
- * @param dac_channel - DAC channel to be activated
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_activate_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel){
 
 	//Receive the correct DAC channel configuration
@@ -124,15 +104,6 @@ MCP4822_STATUS MCP4822_activate_chan(MCP4822_Handle_t *handle, MCP4822_DAC_SELEC
 	return status;
 }
 
-/**
- * Set the gain for one of the DAC channels
- *
- * @param handle - handle for MCP4822 driver
- * @param dac_channel - DAC channel that's gain will be changed
- * @param gain_update - updated gain value (1X or 2X)
- *
- * @return None
- */
 void MCP4822_set_chan_gain(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel, MCP4822_OUTPUT_GAIN gain_update){
 
 	//Receive the correct DAC channel configuration
@@ -142,14 +113,6 @@ void MCP4822_set_chan_gain(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_chan
 	curr_chan_config->gain = gain_update;
 }
 
-/**
- * Write new DAC data to both of the MCP4822 device channels using SPI
- *
- * @param handle - handle for MCP4822 driver
- * @param value - digital value to be sent to the DACs
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_write_to_both_chans(MCP4822_Handle_t *handle, uint16_t value){
 
 	//Write the value to channel A
@@ -164,15 +127,6 @@ MCP4822_STATUS MCP4822_write_to_both_chans(MCP4822_Handle_t *handle, uint16_t va
 	return status;
 }
 
-/**
- * Write new DAC data, after converting from volts, to one of the MCP4822 device channels using SPI
- *
- * @param handle - handle for MCP4822 driver
- * @param volts - voltage value to be converted and sent to the DAC
- * @param dac_channel - DAC channel to be written to
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_write_volts_to_chan(MCP4822_Handle_t *handle, float volts, MCP4822_DAC_SELECT dac_channel){
 
 	//Receive the correct DAC channel configuration
@@ -187,14 +141,6 @@ MCP4822_STATUS MCP4822_write_volts_to_chan(MCP4822_Handle_t *handle, float volts
 	return status;
 }
 
-/**
- * Write new DAC data, after converting from volts, to both of the MCP4822 device channels using SPI
- *
- * @param handle - handle for MCP4822 driver
- * @param volts - voltage value to be converted and sent to the DACs
- *
- * @return MCP4822_OK in case of success, MCP4822_ERROR_INVALID_ARG or MCP4822_ERROR_SPI otherwise
- */
 MCP4822_STATUS MCP4822_write_volts_to_both_chans(MCP4822_Handle_t *handle, float volts){
 
 	//Convert and write the voltage to channel A
@@ -209,14 +155,6 @@ MCP4822_STATUS MCP4822_write_volts_to_both_chans(MCP4822_Handle_t *handle, float
 	return status;
 }
 
-/**
- * Retrieve the pointer to the correct channel configuration
- *
- * @param handle - handle for MCP4822 driver
- * @param dac_channel - channel configuration to be returned
- *
- * @return Pointer to DAC channel configuration struct
- */
 static inline MCP4822_Config_t *get_chan_config(MCP4822_Handle_t *handle, MCP4822_DAC_SELECT dac_channel){
 
 	//Assign pointer to the dac_channel configuration
@@ -231,14 +169,6 @@ static inline MCP4822_Config_t *get_chan_config(MCP4822_Handle_t *handle, MCP482
 	return chan_config;
 }
 
-/**
- * Convert voltage units to DAC digital units
- *
- * @param volts - voltage value to be converted to DAC digital units
- * @param gain - DAC channel gain
- *
- * @return Converted voltage value
- */
 static inline uint16_t volts_to_DAC_units(float volts, MCP4822_OUTPUT_GAIN gain){
 
 	//Calculate the DAC value based on the voltage
